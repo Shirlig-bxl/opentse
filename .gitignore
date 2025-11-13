@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.trae/
+.env
+outputs/
+datasets/OpenTSE-Logs/
+*.pt
