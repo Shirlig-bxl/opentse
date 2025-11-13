@@ -1,0 +1,2 @@
+{"ts": 1763007030.0, "type": "fault_inject", "label": "loss_nan"}
+{"ts": 1763007040.0, "type": "warning", "msg": "Loss is NaN, skipping batch"}

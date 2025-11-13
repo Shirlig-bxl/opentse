@@ -1,0 +1,1 @@
+{"loss": 0, "lr": 1, "grad_norm": 2, "throughput": 3, "ts_x": 4, "cpu_util": 5, "ram_used": 6, "gpu_util": 7, "gpu_mem": 8, "io_read": 9, "io_write": 10, "ts_y": 11, "platform": 12, "stage": 13}
