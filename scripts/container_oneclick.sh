@@ -17,6 +17,7 @@ if [[ -z "$SKIP_INSTALL" ]]; then
 fi
 if [[ -z "$RUNS_GLOB" ]]; then RUNS_GLOB="datasets/OpenTSE-Logs/run_*"; fi
 if [[ -z "$AE_EPOCHS" ]]; then AE_EPOCHS=20; fi
+echo "Config: MODE=${MODE:-${MODE}} NUM_WORKERS=${NUM_WORKERS:-${NUM_WORKERS}} BATCH_SIZE=${BATCH_SIZE:-${BATCH_SIZE}} OOM_BATCH_SIZE=${OOM_BATCH_SIZE:-${OOM_BATCH_SIZE}} SYNTHETIC=${SYNTHETIC:-${SYNTHETIC}} AE_EPOCHS=${AE_EPOCHS:-$AE_EPOCHS} RUNS_GLOB=${RUNS_GLOB:-$RUNS_GLOB}"
 if [[ -z "$SKIP_TRAIN" ]]; then
   bash scripts/run_experiments.sh
 fi
@@ -35,7 +36,17 @@ import os, json, glob, csv
 rows=[]
 for rp in glob.glob('outputs/*/report.json'):
     r=json.load(open(rp))
-    rows.append({'run': r['run'], 'AUPRC': r['AUPRC'], 'LaAP': r['LaAP'], 'mean_delay': r['mean_delay'], 'median_delay': r['median_delay'], 'threshold': r['threshold']})
+    name = r['run']
+    fault = name.split('_',2)[2] if '_' in name else ''
+    mode = os.environ.get('MODE','')
+    num_workers = os.environ.get('NUM_WORKERS','')
+    batch_size = os.environ.get('BATCH_SIZE','')
+    oom_batch_size = os.environ.get('OOM_BATCH_SIZE','')
+    synthetic = os.environ.get('SYNTHETIC','')
+    ae_epochs = os.environ.get('AE_EPOCHS','')
+    runs_glob = os.environ.get('RUNS_GLOB','')
+    batch_used = oom_batch_size if fault in ('oom_vram','oom_ram') and oom_batch_size else batch_size
+    rows.append({'run': name, 'fault': fault, 'AUPRC': r['AUPRC'], 'LaAP': r['LaAP'], 'mean_delay': r['mean_delay'], 'median_delay': r['median_delay'], 'threshold': r['threshold'], 'mode': mode, 'num_workers': num_workers, 'batch_used': batch_used, 'synthetic': synthetic, 'ae_epochs': ae_epochs, 'runs_glob': runs_glob})
 if not rows:
     print('No reports found under outputs/*/report.json'); raise SystemExit(1)
 rows.sort(key=lambda x: x['run'])
